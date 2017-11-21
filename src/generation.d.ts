@@ -1,11 +1,12 @@
 export interface PathConfig {
     inputs: string[];
-    temp: string;
+    temp?: string;
     output: string;
+    tsconfig?: string;
 }
 export interface ProjectConfig {
     name: string;
-    use: string[];
+    use?: string[];
 }
 export interface DocGenerationConfig {
     project: ProjectConfig;

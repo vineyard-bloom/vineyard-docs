@@ -8,6 +8,11 @@ export class Main {
 
   }
 
+  private notused: boolean
+
+  private notUsedFunction() {
+
+  }
   /**
    * @param cycles  Does not do anything, just there for looks.
    * @param child

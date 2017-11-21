@@ -1,4 +1,4 @@
-import {Application, ReflectionKind} from "typedoc";
+import {Application, Reflection, ReflectionKind} from "typedoc";
 import * as fs from 'fs'
 import * as Handlebars from 'handlebars'
 import * as path from 'path'
@@ -9,23 +9,20 @@ import {CommentPlugin} from "typedoc/dist/lib/converter/plugins";
 
 export interface PathConfig {
   inputs: string[]
-  temp: string
+  temp?: string
   output: string
+  tsconfig?: string
 }
 
 export interface ProjectConfig {
   name: string
-  use: string[]
+  use?: string[]
 }
 
 export interface DocGenerationConfig {
   project: ProjectConfig
   paths: PathConfig
 }
-
-// interface FunctionInfo {
-//   name: string
-// }
 
 interface ClassInfo {
   name: string
@@ -74,11 +71,15 @@ function getGroup(groups: ReflectionGroup[], kindId: number) {
 //   return getGroup(groups, ReflectionKind.Method)
 // }
 
+function filterPrivate(members: Reflection[]) {
+  return members.filter(m => !m.flags.isPrivate)
+}
+
 function prepareClass(input: DeclarationReflection): ClassInfo {
   return {
     name: input.name,
-    properties: getGroup(input.groups, ReflectionKind.Property),
-    functions: getGroup(input.groups, ReflectionKind.Method)
+    properties: filterPrivate(getGroup(input.groups, ReflectionKind.Property)),
+    functions: filterPrivate(getGroup(input.groups, ReflectionKind.Method))
   }
 }
 
@@ -97,12 +98,13 @@ function prepareModules(files: SourceFile[]): Module[] {
   return files.map(prepareModule)
 }
 
-function filterSourceFiles(files: SourceFile[], use: string[]) {
-  return files.filter(f => use.includes(getModuleName(f.fileName)))
-}
+// function filterSourceFiles(files: SourceFile[], use: string[]) {
+//   return files.filter(f => use.includes(getModuleName(f.fileName)))
+// }
 
 function prepareSource(src: DocInputData, config: ProjectConfig): DocOutputData {
-  const files = filterSourceFiles(src.files, config.use)
+  // const files = filterSourceFiles(src.files, config.use)
+  const files = src.files
   const modules = prepareModules(files)
 
   return {
@@ -112,12 +114,12 @@ function prepareSource(src: DocInputData, config: ProjectConfig): DocOutputData 
 }
 
 function loadPartialTemplate(name: string) {
-  const template = fs.readFileSync(`src/templates/partials/${name}.handlebars`, 'utf8')
+  const template = fs.readFileSync(__dirname + `/templates/partials/${name}.handlebars`, 'utf8')
   Handlebars.registerPartial(name, template)
 }
 
 function generateMarkdownFile(templateName: string, outputPath: string, data: any) {
-  const template = fs.readFileSync(`src/templates/${templateName}.handlebars`, 'utf8')
+  const template = fs.readFileSync(__dirname + `/templates/${templateName}.handlebars`, 'utf8')
   const documentation = Handlebars.compile(template)(data)
   fs.writeFileSync(outputPath, documentation)
 }
@@ -128,14 +130,18 @@ export function generateDocs(config: DocGenerationConfig) {
   const app = new Application({
     module: 'commonjs',
     excludeExternals: true,
+    tsconfig: './tsconfig.json'
   })
 
   const src = app.convert(paths.inputs)
   if (!src)
     throw new Error("Could not generate documentation.")
 
-  generatePath(paths.temp)
-  app.generateJson(src, paths.temp + '/doc.json')
+  if (paths.temp) {
+    generatePath(paths.temp)
+
+    app.generateJson(src, paths.temp + '/doc.json')
+  }
 
   const partials = ['class', 'function', 'member', 'property']
   partials.forEach(loadPartialTemplate)

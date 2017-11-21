@@ -24,11 +24,14 @@ function getGroup(groups, kindId) {
 // function getFunctions(groups:ReflectionGroup[]){
 //   return getGroup(groups, ReflectionKind.Method)
 // }
+function filterPrivate(members) {
+    return members.filter(m => !m.flags.isPrivate);
+}
 function prepareClass(input) {
     return {
         name: input.name,
-        properties: getGroup(input.groups, typedoc_1.ReflectionKind.Property),
-        functions: getGroup(input.groups, typedoc_1.ReflectionKind.Method)
+        properties: filterPrivate(getGroup(input.groups, typedoc_1.ReflectionKind.Property)),
+        functions: filterPrivate(getGroup(input.groups, typedoc_1.ReflectionKind.Method))
     };
 }
 function prepareModule(file) {
@@ -43,11 +46,12 @@ function prepareModule(file) {
 function prepareModules(files) {
     return files.map(prepareModule);
 }
-function filterSourceFiles(files, use) {
-    return files.filter(f => use.includes(getModuleName(f.fileName)));
-}
+// function filterSourceFiles(files: SourceFile[], use: string[]) {
+//   return files.filter(f => use.includes(getModuleName(f.fileName)))
+// }
 function prepareSource(src, config) {
-    const files = filterSourceFiles(src.files, config.use);
+    // const files = filterSourceFiles(src.files, config.use)
+    const files = src.files;
     const modules = prepareModules(files);
     return {
         name: config.name,
@@ -55,11 +59,11 @@ function prepareSource(src, config) {
     };
 }
 function loadPartialTemplate(name) {
-    const template = fs.readFileSync(`src/templates/partials/${name}.handlebars`, 'utf8');
+    const template = fs.readFileSync(__dirname + `/templates/partials/${name}.handlebars`, 'utf8');
     Handlebars.registerPartial(name, template);
 }
 function generateMarkdownFile(templateName, outputPath, data) {
-    const template = fs.readFileSync(`src/templates/${templateName}.handlebars`, 'utf8');
+    const template = fs.readFileSync(__dirname + `/templates/${templateName}.handlebars`, 'utf8');
     const documentation = Handlebars.compile(template)(data);
     fs.writeFileSync(outputPath, documentation);
 }
@@ -68,12 +72,15 @@ function generateDocs(config) {
     const app = new typedoc_1.Application({
         module: 'commonjs',
         excludeExternals: true,
+        tsconfig: './tsconfig.json'
     });
     const src = app.convert(paths.inputs);
     if (!src)
         throw new Error("Could not generate documentation.");
-    generatePath(paths.temp);
-    app.generateJson(src, paths.temp + '/doc.json');
+    if (paths.temp) {
+        generatePath(paths.temp);
+        app.generateJson(src, paths.temp + '/doc.json');
+    }
     const partials = ['class', 'function', 'member', 'property'];
     partials.forEach(loadPartialTemplate);
     const data = prepareSource(src, config.project);
