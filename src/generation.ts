@@ -6,45 +6,7 @@ import {} from "typedoc/dist/lib/models";
 import {DeclarationReflection, SourceFile} from "typedoc/dist/lib/models";
 import {ReflectionGroup} from "typedoc/dist/lib/models/ReflectionGroup";
 import {CommentPlugin} from "typedoc/dist/lib/converter/plugins";
-
-export interface PathConfig {
-  inputs: string[]
-  temp?: string
-  output: string
-  tsconfig?: string
-}
-
-export interface ProjectConfig {
-  name: string
-  use?: string[]
-}
-
-export interface DocGenerationConfig {
-  project: ProjectConfig
-  paths: PathConfig
-}
-
-interface ClassInfo {
-  name: string
-  functions: DeclarationReflection []
-  properties: DeclarationReflection []
-}
-
-interface Module {
-  name: string
-  classes: ClassInfo[]
-  interfaces: ClassInfo[]
-  functions: DeclarationReflection[]
-}
-
-interface DocInputData {
-  files: SourceFile[]
-}
-
-interface DocOutputData {
-  name: string,
-  modules: Module[]
-}
+import {DocGenerationConfig, DocInputData, ProjectConfig} from "./types";
 
 function generatePath(newPath: string) {
   newPath.split('/').reduce((parentDir, childDir) => {
@@ -71,47 +33,47 @@ function getGroup(groups: ReflectionGroup[], kindId: number) {
 //   return getGroup(groups, ReflectionKind.Method)
 // }
 
-function filterPrivate(members: Reflection[]) {
+function filterPrivate(members: DeclarationReflection[]): DeclarationReflection[] {
   return members.filter(m => !m.flags.isPrivate)
 }
 
-function prepareClass(input: DeclarationReflection): ClassInfo {
-  return {
-    name: input.name,
-    properties: filterPrivate(getGroup(input.groups, ReflectionKind.Property)),
-    functions: filterPrivate(getGroup(input.groups, ReflectionKind.Method))
-  }
-}
-
-function prepareModule(file: SourceFile): Module {
-  const groups = file.groups
-
-  return {
-    name: getModuleName(file.fileName),
-    classes: getGroup(groups, ReflectionKind.Class).map(prepareClass),
-    interfaces: getGroup(groups, ReflectionKind.Interface).map(prepareClass),
-    functions: getGroup(groups, ReflectionKind.Function),
-  }
-}
-
-function prepareModules(files: SourceFile[]): Module[] {
-  return files.map(prepareModule)
-}
-
-// function filterSourceFiles(files: SourceFile[], use: string[]) {
-//   return files.filter(f => use.includes(getModuleName(f.fileName)))
+// function prepareClass(input: DeclarationReflection): ClassInfo {
+//   return {
+//     name: input.name,
+//     properties: filterPrivate(getGroup(input.groups, ReflectionKind.Property)),
+//     functions: filterPrivate(getGroup(input.groups, ReflectionKind.Method))
+//   }
 // }
 
-function prepareSource(src: DocInputData, config: ProjectConfig): DocOutputData {
-  // const files = filterSourceFiles(src.files, config.use)
-  const files = src.files
-  const modules = prepareModules(files)
-
-  return {
-    name: config.name,
-    modules: modules,
-  }
-}
+// function prepareModule(file: SourceFile): Module {
+//   const groups = file.groups
+//
+//   return {
+//     name: getModuleName(file.fileName),
+//     classes: getGroup(groups, ReflectionKind.Class).map(prepareClass),
+//     interfaces: getGroup(groups, ReflectionKind.Interface).map(prepareClass),
+//     functions: getGroup(groups, ReflectionKind.Function),
+//   }
+// }
+//
+// function prepareModules(files: SourceFile[]): Module[] {
+//   return files.map(prepareModule)
+// }
+//
+// // function filterSourceFiles(files: SourceFile[], use: string[]) {
+// //   return files.filter(f => use.includes(getModuleName(f.fileName)))
+// // }
+//
+// function prepareSource(src: DocInputData, config: ProjectConfig): DocOutputData {
+//   // const files = filterSourceFiles(src.files, config.use)
+//   const files = src.files
+//   const modules = prepareModules(files)
+//
+//   return {
+//     name: config.name,
+//     modules: modules,
+//   }
+// }
 
 function loadPartialTemplate(name: string) {
   const template = fs.readFileSync(__dirname + `/templates/partials/${name}.handlebars`, 'utf8')
@@ -124,34 +86,87 @@ function generateMarkdownFile(templateName: string, outputPath: string, data: an
   fs.writeFileSync(outputPath, documentation)
 }
 
+type Hierarchy = string | any[]
+
+function flatten<T>(input: T[]) {
+  return [].concat.apply([], input)
+}
+
+function getHierarchy(rootDirectory: string, fileOrDirectory: string): Hierarchy {
+  return fs.lstatSync(rootDirectory + '/' + fileOrDirectory).isDirectory()
+    ? flatten(fs.readdirSync(rootDirectory + '/' + fileOrDirectory).map(f => getHierarchy(rootDirectory, fileOrDirectory + '/' + f)))
+    : [fileOrDirectory]
+}
+
+function getRelativeHierarchy(directory: string): Hierarchy[] {
+  return flatten(fs.readdirSync(directory).map(f => getHierarchy(directory, f)))
+}
+
+function getAbsoluteHierarchy(fileOrDirectory: string): string[] {
+  if (!fs.lstatSync(fileOrDirectory).isDirectory())
+    return [fileOrDirectory]
+
+  const hierarchy = fs.readdirSync(fileOrDirectory).map(f => getAbsoluteHierarchy(fileOrDirectory + '/' + f))
+  return flatten(hierarchy)
+}
+
+function copyHierarchy(files: Hierarchy, src: string, dist: string, data: any) {
+  const fsExtra = require('fs-extra')
+  for (let file of files) {
+    if (path.extname(file) == '.handlebars') {
+      const template = fs.readFileSync(src + '/' + file, 'utf8')
+      const documentation = Handlebars.compile(template)(data)
+      fs.writeFileSync(dist + '/' + file.replace('.handlebars', '.md'), documentation)
+    }
+    else {
+      fsExtra.copySync(src + '/' + file, dist + '/' + file)
+    }
+  }
+}
+
+function flattenModuleChildren(modules: SourceFile[]) {
+  return flatten(modules.map(m => m.reflections))
+}
+
 export function generateDocs(config: DocGenerationConfig) {
   const paths = config.paths
 
-  const app = new Application({
+  const settings: any = {
     module: 'commonjs',
-    excludeExternals: true,
-    tsconfig: './tsconfig.json'
-  })
-
-  const src = app.convert(paths.inputs)
-  if (!src)
-    throw new Error("Could not generate documentation.")
-
-  if (paths.temp) {
-    generatePath(paths.temp)
-
-    app.generateJson(src, paths.temp + '/doc.json')
+    excludeExternals: true
   }
+  if (paths.tsconfig)
+    settings.tsconfig = paths.tsconfig
+
+  const app = new Application(settings)
+
+  const sources = flatten(paths.src.map(getAbsoluteHierarchy))
+    .filter((s: string) => path.extname(s) == '.ts')
+
+  const src = app.convert(sources)
+  if (!src)
+    throw new Error("Error parsing TypeScript source.")
 
   const partials = ['class', 'function', 'member', 'property']
   partials.forEach(loadPartialTemplate)
-  const data = prepareSource(src, config.project)
+  // const data = prepareSource(src, config.project)
 
+  const elements = flattenModuleChildren(src.files)
   generatePath(paths.output)
 
-  generateMarkdownFile('index', paths.output + '/index.md', data)
+  const files = getRelativeHierarchy(paths.content)
+  console.log(files)
 
-  for (let module of data.modules) {
-    generateMarkdownFile('module', paths.output + `/${module.name}.md`, module)
-  }
+  Handlebars.registerHelper('class', function(options: any) {
+    return new Handlebars.SafeString(
+      ''
+    )
+  })
+
+  copyHierarchy(files, paths.content, paths.output, elements)
+  // generateMarkdownFile('index', paths.output + '/index.md', data)
+  //
+  // for (let module of data.modules) {
+  //   generateMarkdownFile('module', paths.output + `/${module.name}.md`, module)
+  // }
 }

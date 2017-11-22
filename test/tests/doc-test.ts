@@ -13,8 +13,8 @@ describe('doc-test', function () {
         use: ['main'],
       },
       paths: {
-        inputs: ['test/res/src/main.ts'],
-        temp: 'test/temp/temp',
+        src: ['test/res/src/main.ts'],
+        content: 'test/content',
         output: 'test/temp/dist',
       }
     })
