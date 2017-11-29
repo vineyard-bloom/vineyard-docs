@@ -27,13 +27,13 @@ function getGroup(groups, kindId) {
 function filterPrivate(members) {
     return members.filter(m => !m.flags.isPrivate);
 }
-// function prepareClass(input: DeclarationReflection): ClassInfo {
-//   return {
-//     name: input.name,
-//     properties: filterPrivate(getGroup(input.groups, ReflectionKind.Property)),
-//     functions: filterPrivate(getGroup(input.groups, ReflectionKind.Method))
-//   }
-// }
+function prepareClass(input) {
+    return {
+        name: input.name,
+        properties: filterPrivate(getGroup(input.groups, typedoc_1.ReflectionKind.Property)),
+        functions: filterPrivate(getGroup(input.groups, typedoc_1.ReflectionKind.Method))
+    };
+}
 // function prepareModule(file: SourceFile): Module {
 //   const groups = file.groups
 //
@@ -103,7 +103,17 @@ function copyHierarchy(files, src, dist, data) {
     }
 }
 function flattenModuleChildren(modules) {
-    return flatten(modules.map(m => m.reflections));
+    const elements = flatten(modules.map(m => m.reflections));
+    const result = {};
+    for (let element of elements) {
+        if (element.kind == typedoc_1.ReflectionKind.Class) {
+            result[element.name] = prepareClass(element);
+        }
+        else {
+            result[element.name] = element;
+        }
+    }
+    return result;
 }
 function generateDocs(config) {
     const paths = config.paths;
@@ -115,21 +125,23 @@ function generateDocs(config) {
         settings.tsconfig = paths.tsconfig;
     const app = new typedoc_1.Application(settings);
     const sources = flatten(paths.src.map(getAbsoluteHierarchy))
-        .filter((s) => path.extname(s) == '.ts');
+        .filter((s) => path.extname(s) == '.ts' && s.indexOf('.d.ts') == -1 && s.indexOf('index.ts') == -1);
     const src = app.convert(sources);
     if (!src)
         throw new Error("Error parsing TypeScript source.");
-    const partials = ['class', 'function', 'member', 'property'];
+    const partials = ['class', 'function', 'member', 'property', 'type'];
     partials.forEach(loadPartialTemplate);
     // const data = prepareSource(src, config.project)
     const elements = flattenModuleChildren(src.files);
     generatePath(paths.output);
     const files = getRelativeHierarchy(paths.content);
     console.log(files);
-    Handlebars.registerHelper('class', function (options) {
-        return new Handlebars.SafeString('');
-    });
-    copyHierarchy(files, paths.content, paths.output, elements);
+    // Handlebars.registerHelper('class', function(options: any) {
+    //   return new Handlebars.SafeString(
+    //     ''
+    //   )
+    // })
+    copyHierarchy(files, paths.content, paths.output, { elements: elements });
     // generateMarkdownFile('index', paths.output + '/index.md', data)
     //
     // for (let module of data.modules) {

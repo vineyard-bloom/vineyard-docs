@@ -6,7 +6,7 @@ import {} from "typedoc/dist/lib/models";
 import {DeclarationReflection, SourceFile} from "typedoc/dist/lib/models";
 import {ReflectionGroup} from "typedoc/dist/lib/models/ReflectionGroup";
 import {CommentPlugin} from "typedoc/dist/lib/converter/plugins";
-import {DocGenerationConfig, DocInputData, ProjectConfig} from "./types";
+import {ClassInfo, DocGenerationConfig, DocInputData, ProjectConfig} from "./types";
 
 function generatePath(newPath: string) {
   newPath.split('/').reduce((parentDir, childDir) => {
@@ -37,13 +37,13 @@ function filterPrivate(members: DeclarationReflection[]): DeclarationReflection[
   return members.filter(m => !m.flags.isPrivate)
 }
 
-// function prepareClass(input: DeclarationReflection): ClassInfo {
-//   return {
-//     name: input.name,
-//     properties: filterPrivate(getGroup(input.groups, ReflectionKind.Property)),
-//     functions: filterPrivate(getGroup(input.groups, ReflectionKind.Method))
-//   }
-// }
+function prepareClass(input: DeclarationReflection): ClassInfo {
+  return {
+    name: input.name,
+    properties: filterPrivate(getGroup(input.groups, ReflectionKind.Property)),
+    functions: filterPrivate(getGroup(input.groups, ReflectionKind.Method))
+  }
+}
 
 // function prepareModule(file: SourceFile): Module {
 //   const groups = file.groups
@@ -125,7 +125,17 @@ function copyHierarchy(files: Hierarchy, src: string, dist: string, data: any) {
 }
 
 function flattenModuleChildren(modules: SourceFile[]) {
-  return flatten(modules.map(m => m.reflections))
+  const elements = flatten(modules.map(m => m.reflections))
+  const result: any = {}
+  for (let element of elements) {
+    if (element.kind == ReflectionKind.Class) {
+      result[element.name] = prepareClass(element)
+    }
+    else {
+      result[element.name] = element
+    }
+  }
+  return result
 }
 
 export function generateDocs(config: DocGenerationConfig) {
@@ -141,13 +151,13 @@ export function generateDocs(config: DocGenerationConfig) {
   const app = new Application(settings)
 
   const sources = flatten(paths.src.map(getAbsoluteHierarchy))
-    .filter((s: string) => path.extname(s) == '.ts')
+    .filter((s: string) => path.extname(s) == '.ts' && s.indexOf('.d.ts') == -1 && s.indexOf('index.ts') == -1)
 
   const src = app.convert(sources)
   if (!src)
     throw new Error("Error parsing TypeScript source.")
 
-  const partials = ['class', 'function', 'member', 'property']
+  const partials = ['class', 'function', 'member', 'property', 'type']
   partials.forEach(loadPartialTemplate)
   // const data = prepareSource(src, config.project)
 
@@ -157,13 +167,13 @@ export function generateDocs(config: DocGenerationConfig) {
   const files = getRelativeHierarchy(paths.content)
   console.log(files)
 
-  Handlebars.registerHelper('class', function(options: any) {
-    return new Handlebars.SafeString(
-      ''
-    )
-  })
+  // Handlebars.registerHelper('class', function(options: any) {
+  //   return new Handlebars.SafeString(
+  //     ''
+  //   )
+  // })
 
-  copyHierarchy(files, paths.content, paths.output, elements)
+  copyHierarchy(files, paths.content, paths.output, {elements: elements})
   // generateMarkdownFile('index', paths.output + '/index.md', data)
   //
   // for (let module of data.modules) {

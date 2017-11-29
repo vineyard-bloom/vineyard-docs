@@ -1,11 +1,11 @@
 `{{name}}`
+{{comment.shortText}}{{signatures.0.comment.shortText}}
 {{#if signatures.0.parameters}}
 
-**Parameters**
-({{#each signatures.0.parameters}}
-* {{name}}: `{{type.name}}`{{/each}}
+Parameters
+{{#each signatures.0.parameters}}
+* {{name}} `{{> type type}}` {{comment.text}}
+{{/each}}
 {{/if}}
 
-**Returns** `{{signatures.0.type.name}}`
-
-{{comment.shortText}}{{signatures.0.comment.shortText}}
+Returns `{{> type signatures.0.type}}`

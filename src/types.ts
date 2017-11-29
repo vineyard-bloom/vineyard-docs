@@ -17,12 +17,12 @@ export interface DocGenerationConfig {
   paths: PathConfig
 }
 
-// export interface ClassInfo {
-//   name: string
-//   functions: DeclarationReflection []
-//   properties: DeclarationReflection []
-// }
-//
+export interface ClassInfo {
+  name: string
+  functions: DeclarationReflection []
+  properties: DeclarationReflection []
+}
+
 // export interface Module {
 //   name: string
 //   classes: ClassInfo[]

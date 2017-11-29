@@ -13,12 +13,25 @@ export class Main {
   private notUsedFunction() {
 
   }
+
   /**
    * @param cycles  Does not do anything, just there for looks.
    * @param child
    */
   run(cycles: number, child: Main) {
 
+  }
+
+  doNothing(): any[] {
+    return []
+  }
+
+  /**
+   * Does not do anything, the sequel.
+   * @param crazy  Does not do anything, just there for looks.
+   */
+  doNothing2(crazy: string): any[] {
+    return []
   }
 }
 
