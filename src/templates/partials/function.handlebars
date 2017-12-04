@@ -1,11 +1,3 @@
 `{{name}}`
-{{comment.shortText}}{{signatures.0.comment.shortText}}
-{{#if signatures.0.parameters}}
-
-Parameters
-{{#each signatures.0.parameters}}
-* {{name}} `{{> type type}}` {{comment.text}}
-{{/each}}
-{{/if}}
-
-Returns `{{> type signatures.0.type}}`
+{{{comment.shortText}}}{{{signatures.0.comment.shortText}}}
+{{> function_body }}

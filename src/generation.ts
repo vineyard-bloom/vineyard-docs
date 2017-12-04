@@ -40,6 +40,7 @@ function filterPrivate(members: DeclarationReflection[]): DeclarationReflection[
 function prepareClass(input: DeclarationReflection): ClassInfo {
   return {
     name: input.name,
+    constructor: input.children.filter(c => c.kind == ReflectionKind.Constructor)[0],
     properties: filterPrivate(getGroup(input.groups, ReflectionKind.Property)),
     functions: filterPrivate(getGroup(input.groups, ReflectionKind.Method))
   }
@@ -157,7 +158,7 @@ export function generateDocs(config: DocGenerationConfig) {
   if (!src)
     throw new Error("Error parsing TypeScript source.")
 
-  const partials = ['class', 'function', 'member', 'property', 'type']
+  const partials = ['class', 'function', 'function_body', 'member', 'property', 'type']
   partials.forEach(loadPartialTemplate)
   // const data = prepareSource(src, config.project)
 

@@ -1,0 +1,10 @@
+{{#if signatures.0.parameters}}
+
+Parameters
+
+{{#each signatures.0.parameters}}
+* {{#if flags.isOptional }}*(optional)*{{/if}} {{name}} `{{> type type}}` {{#if defaultValue }}(*default*=`{{{defaultValue}}}`) {{/if}}{{{comment.text}}}
+{{/each}}
+{{/if}}
+
+Returns `{{> type signatures.0.type}}`

@@ -18,7 +18,7 @@ export class Main {
    * @param cycles  Does not do anything, just there for looks.
    * @param child
    */
-  run(cycles: number, child: Main) {
+  run(cycles: number, child?: Main) {
 
   }
 
@@ -30,7 +30,7 @@ export class Main {
    * Does not do anything, the sequel.
    * @param crazy  Does not do anything, just there for looks.
    */
-  doNothing2(crazy: string): any[] {
+  doNothing2(crazy: string = 'this is a default'): any[] {
     return []
   }
 }

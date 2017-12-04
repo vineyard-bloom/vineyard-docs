@@ -30,6 +30,7 @@ function filterPrivate(members) {
 function prepareClass(input) {
     return {
         name: input.name,
+        constructor: input.children.filter(c => c.kind == typedoc_1.ReflectionKind.Constructor)[0],
         properties: filterPrivate(getGroup(input.groups, typedoc_1.ReflectionKind.Property)),
         functions: filterPrivate(getGroup(input.groups, typedoc_1.ReflectionKind.Method))
     };
@@ -129,7 +130,7 @@ function generateDocs(config) {
     const src = app.convert(sources);
     if (!src)
         throw new Error("Error parsing TypeScript source.");
-    const partials = ['class', 'function', 'member', 'property', 'type'];
+    const partials = ['class', 'function', 'function_body', 'member', 'property', 'type'];
     partials.forEach(loadPartialTemplate);
     // const data = prepareSource(src, config.project)
     const elements = flattenModuleChildren(src.files);

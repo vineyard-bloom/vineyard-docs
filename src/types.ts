@@ -19,6 +19,7 @@ export interface DocGenerationConfig {
 
 export interface ClassInfo {
   name: string
+  constructor: DeclarationReflection
   functions: DeclarationReflection []
   properties: DeclarationReflection []
 }
