@@ -1,6 +1,6 @@
 {
   "name": "vineyard-docs",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Tool for generating Markdown documentation from TypeScript",
   "main": "src/index.js",
   "types": "src/index.d.ts",
