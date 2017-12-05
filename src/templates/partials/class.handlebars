@@ -1,10 +1,10 @@
 {{#if constructor}}
-### Constructor
+#### Constructor
 {{> function_body constructor }}
 {{/if}}
 {{#if properties}}
 
-### Properties
+#### Properties
 
 {{#each properties}}
 * {{> property }}
@@ -12,9 +12,9 @@
 {{/if}}
 {{#if functions}}
 
-### Functions
+#### Functions
 
 {{#each functions}}
-#### {{> function }}
+##### {{> function }}
 {{/each}}
 {{/if}}

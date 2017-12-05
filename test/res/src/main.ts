@@ -46,3 +46,9 @@ export interface Entity {
    */
   kill(): void
 }
+
+export enum MeansOfTravel {
+  flying,
+  teleporting,
+  somersaults,
+}

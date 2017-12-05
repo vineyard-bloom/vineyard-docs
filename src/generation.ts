@@ -29,10 +29,6 @@ function getGroup(groups: ReflectionGroup[], kindId: number) {
     : []
 }
 
-// function getFunctions(groups:ReflectionGroup[]){
-//   return getGroup(groups, ReflectionKind.Method)
-// }
-
 function filterPrivate(members: DeclarationReflection[]): DeclarationReflection[] {
   return members.filter(m => !m.flags.isPrivate)
 }
@@ -45,36 +41,6 @@ function prepareClass(input: DeclarationReflection): ClassInfo {
     functions: filterPrivate(getGroup(input.groups, ReflectionKind.Method))
   }
 }
-
-// function prepareModule(file: SourceFile): Module {
-//   const groups = file.groups
-//
-//   return {
-//     name: getModuleName(file.fileName),
-//     classes: getGroup(groups, ReflectionKind.Class).map(prepareClass),
-//     interfaces: getGroup(groups, ReflectionKind.Interface).map(prepareClass),
-//     functions: getGroup(groups, ReflectionKind.Function),
-//   }
-// }
-//
-// function prepareModules(files: SourceFile[]): Module[] {
-//   return files.map(prepareModule)
-// }
-//
-// // function filterSourceFiles(files: SourceFile[], use: string[]) {
-// //   return files.filter(f => use.includes(getModuleName(f.fileName)))
-// // }
-//
-// function prepareSource(src: DocInputData, config: ProjectConfig): DocOutputData {
-//   // const files = filterSourceFiles(src.files, config.use)
-//   const files = src.files
-//   const modules = prepareModules(files)
-//
-//   return {
-//     name: config.name,
-//     modules: modules,
-//   }
-// }
 
 function loadPartialTemplate(name: string) {
   const template = fs.readFileSync(__dirname + `/templates/partials/${name}.handlebars`, 'utf8')
@@ -153,14 +119,14 @@ export function generateDocs(config: DocGenerationConfig) {
 
   const sources = flatten(paths.src.map(getAbsoluteHierarchy))
     .filter((s: string) => path.extname(s) == '.ts' && s.indexOf('.d.ts') == -1 && s.indexOf('index.ts') == -1)
+    .map((f: any) => path.resolve(f))
 
   const src = app.convert(sources)
   if (!src)
     throw new Error("Error parsing TypeScript source.")
 
-  const partials = ['class', 'function', 'function_body', 'member', 'property', 'type']
+  const partials = ['class', 'enum', 'function', 'function_body', 'member', 'property', 'type']
   partials.forEach(loadPartialTemplate)
-  // const data = prepareSource(src, config.project)
 
   const elements = flattenModuleChildren(src.files)
   generatePath(paths.output)
@@ -168,16 +134,5 @@ export function generateDocs(config: DocGenerationConfig) {
   const files = getRelativeHierarchy(paths.content)
   console.log(files)
 
-  // Handlebars.registerHelper('class', function(options: any) {
-  //   return new Handlebars.SafeString(
-  //     ''
-  //   )
-  // })
-
   copyHierarchy(files, paths.content, paths.output, {elements: elements})
-  // generateMarkdownFile('index', paths.output + '/index.md', data)
-  //
-  // for (let module of data.modules) {
-  //   generateMarkdownFile('module', paths.output + `/${module.name}.md`, module)
-  // }
 }
