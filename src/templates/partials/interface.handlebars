@@ -1,0 +1,16 @@
+{{#if properties}}
+
+#### Properties
+
+{{#each properties}}
+* {{> property }}
+{{/each}}
+{{/if}}
+{{#if functions}}
+
+#### Functions
+
+{{#each functions}}
+##### {{> function }}
+{{/each}}
+{{/if}}

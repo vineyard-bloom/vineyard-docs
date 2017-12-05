@@ -95,7 +95,7 @@ function flattenModuleChildren(modules: SourceFile[]) {
   const elements = flatten(modules.map(m => m.reflections))
   const result: any = {}
   for (let element of elements) {
-    if (element.kind == ReflectionKind.Class) {
+    if (element.kind == ReflectionKind.Class || element.kind == ReflectionKind.Interface) {
       result[element.name] = prepareClass(element)
     }
     else {
@@ -125,7 +125,7 @@ export function generateDocs(config: DocGenerationConfig) {
   if (!src)
     throw new Error("Error parsing TypeScript source.")
 
-  const partials = ['class', 'enum', 'function', 'function_body', 'member', 'property', 'type']
+  const partials = ['class', 'enum', 'function', 'function_body', 'interface', 'member', 'property', 'type']
   partials.forEach(loadPartialTemplate)
 
   const elements = flattenModuleChildren(src.files)

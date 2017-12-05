@@ -75,7 +75,7 @@ function flattenModuleChildren(modules) {
     const elements = flatten(modules.map(m => m.reflections));
     const result = {};
     for (let element of elements) {
-        if (element.kind == typedoc_1.ReflectionKind.Class) {
+        if (element.kind == typedoc_1.ReflectionKind.Class || element.kind == typedoc_1.ReflectionKind.Interface) {
             result[element.name] = prepareClass(element);
         }
         else {
@@ -99,7 +99,7 @@ function generateDocs(config) {
     const src = app.convert(sources);
     if (!src)
         throw new Error("Error parsing TypeScript source.");
-    const partials = ['class', 'enum', 'function', 'function_body', 'member', 'property', 'type'];
+    const partials = ['class', 'enum', 'function', 'function_body', 'interface', 'member', 'property', 'type'];
     partials.forEach(loadPartialTemplate);
     const elements = flattenModuleChildren(src.files);
     generatePath(paths.output);
