@@ -5,6 +5,7 @@ export interface PathConfig {
   content: string,
   output: string
   tsconfig?: string
+  diagrams?: string
 }
 
 export interface ProjectConfig {

@@ -3,8 +3,10 @@ import {generateDocs} from "../../src/generation";
 require('source-map-support').install()
 import {assert} from 'chai'
 
+const minute = 60 * 1000
+
 describe('doc-test', function () {
-  this.timeout(15000)
+  this.timeout(2 * minute)
 
   it('generates beautiful documentation', function () {
     generateDocs({
@@ -16,6 +18,7 @@ describe('doc-test', function () {
         src: ['test/res/src/main.ts'],
         content: 'test/content',
         output: 'test/temp/dist',
+        diagrams: 'test/diagrams'
       }
     })
   })

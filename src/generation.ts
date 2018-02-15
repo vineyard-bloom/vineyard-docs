@@ -1,12 +1,10 @@
-import {Application, Reflection, ReflectionKind} from "typedoc";
+import { Application, ReflectionKind } from "typedoc";
 import * as fs from 'fs'
 import * as Handlebars from 'handlebars'
 import * as path from 'path'
-import {} from "typedoc/dist/lib/models";
-import {DeclarationReflection, SourceFile} from "typedoc/dist/lib/models";
-import {ReflectionGroup} from "typedoc/dist/lib/models/ReflectionGroup";
-import {CommentPlugin} from "typedoc/dist/lib/converter/plugins";
-import {ClassInfo, DocGenerationConfig, DocInputData, ProjectConfig} from "./types";
+import { DeclarationReflection, SourceFile } from "typedoc/dist/lib/models";
+import { ReflectionGroup } from "typedoc/dist/lib/models/ReflectionGroup";
+import { ClassInfo, DocGenerationConfig } from "./types";
 
 function generatePath(newPath: string) {
   newPath.split('/').reduce((parentDir, childDir) => {
@@ -105,6 +103,23 @@ function flattenModuleChildren(modules: SourceFile[]) {
   return result
 }
 
+export function processDiagrams(inputPath: string, outputPath: string) {
+  const viz = require('viz.js')
+  const files = fs.readdirSync(inputPath)
+    .filter(f => !fs.lstatSync(inputPath + '/' + f).isDirectory())
+
+  generatePath(outputPath)
+
+  for (let file of files) {
+    const inputContent = fs.readFileSync(inputPath + '/' + file, 'utf8')
+    const outputContent = viz(inputContent, {
+      format: 'svg',
+      engine: 'dot',
+    })
+    fs.writeFileSync(outputPath + '/' + file.split('.')[0] + '.svg', outputContent)
+  }
+}
+
 export function generateDocs(config: DocGenerationConfig) {
   const paths = config.paths
 
@@ -125,7 +140,8 @@ export function generateDocs(config: DocGenerationConfig) {
   if (!src)
     throw new Error("Error parsing TypeScript source.")
 
-  const partials = ['class', 'enum', 'function', 'function_body', 'interface', 'member', 'property', 'type']
+  const partials = fs.readdirSync('src/templates/partials')
+    .map(f => f.split('.')[0])// ['class', 'enum', 'function', 'function_body', 'interface', 'member', 'property', 'type']
   partials.forEach(loadPartialTemplate)
 
   const elements = flattenModuleChildren(src.files)
@@ -134,5 +150,8 @@ export function generateDocs(config: DocGenerationConfig) {
   const files = getRelativeHierarchy(paths.content)
   console.log(files)
 
-  copyHierarchy(files, paths.content, paths.output, {elements: elements})
+  copyHierarchy(files, paths.content, paths.output, { elements: elements })
+
+  if (typeof paths.diagrams === 'string')
+    processDiagrams(paths.diagrams, paths.output + '/diagrams')
 }

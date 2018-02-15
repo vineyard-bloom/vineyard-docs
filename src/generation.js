@@ -84,6 +84,21 @@ function flattenModuleChildren(modules) {
     }
     return result;
 }
+function processDiagrams(inputPath, outputPath) {
+    const viz = require('viz.js');
+    const files = fs.readdirSync(inputPath)
+        .filter(f => !fs.lstatSync(inputPath + '/' + f).isDirectory());
+    generatePath(outputPath);
+    for (let file of files) {
+        const inputContent = fs.readFileSync(inputPath + '/' + file, 'utf8');
+        const outputContent = viz(inputContent, {
+            format: 'svg',
+            engine: 'dot',
+        });
+        fs.writeFileSync(outputPath + '/' + file.split('.')[0] + '.svg', outputContent);
+    }
+}
+exports.processDiagrams = processDiagrams;
 function generateDocs(config) {
     const paths = config.paths;
     const settings = {
@@ -99,13 +114,16 @@ function generateDocs(config) {
     const src = app.convert(sources);
     if (!src)
         throw new Error("Error parsing TypeScript source.");
-    const partials = ['class', 'enum', 'function', 'function_body', 'interface', 'member', 'property', 'type'];
+    const partials = fs.readdirSync('src/templates/partials')
+        .map(f => f.split('.')[0]); // ['class', 'enum', 'function', 'function_body', 'interface', 'member', 'property', 'type']
     partials.forEach(loadPartialTemplate);
     const elements = flattenModuleChildren(src.files);
     generatePath(paths.output);
     const files = getRelativeHierarchy(paths.content);
     console.log(files);
     copyHierarchy(files, paths.content, paths.output, { elements: elements });
+    if (typeof paths.diagrams === 'string')
+        processDiagrams(paths.diagrams, paths.output + '/diagrams');
 }
 exports.generateDocs = generateDocs;
 //# sourceMappingURL=generation.js.map
