@@ -103,7 +103,7 @@ function flattenModuleChildren(modules: SourceFile[]) {
   return result
 }
 
-export function processDiagrams(inputPath: string, outputPath: string) {
+export function generateDiagrams(inputPath: string, outputPath: string) {
   const viz = require('viz.js')
   const files = fs.readdirSync(inputPath)
     .filter(f => !fs.lstatSync(inputPath + '/' + f).isDirectory())
@@ -120,22 +120,20 @@ export function processDiagrams(inputPath: string, outputPath: string) {
   }
 }
 
-export function generateDocs(config: DocGenerationConfig) {
-  const paths = config.paths
+export function loadSourceCode(config: DocGenerationConfig) {
+  if (!config.paths.src)
+    return {}
 
   const settings: any = {
     module: 'commonjs',
     excludeExternals: true
   }
-  if (paths.tsconfig)
-    settings.tsconfig = paths.tsconfig
 
-  const app = new Application(settings)
-
-  const sources = flatten(paths.src.map(getAbsoluteHierarchy))
+  const sources = flatten(config.paths.src.map(getAbsoluteHierarchy))
     .filter((s: string) => path.extname(s) == '.ts' && s.indexOf('.d.ts') == -1 && s.indexOf('index.ts') == -1)
     .map((f: any) => path.resolve(f))
 
+  const app = new Application(settings)
   const src = app.convert(sources)
   if (!src)
     throw new Error("Error parsing TypeScript source.")
@@ -144,7 +142,13 @@ export function generateDocs(config: DocGenerationConfig) {
     .map(f => f.split('.')[0])// ['class', 'enum', 'function', 'function_body', 'interface', 'member', 'property', 'type']
   partials.forEach(loadPartialTemplate)
 
-  const elements = flattenModuleChildren(src.files)
+  return flattenModuleChildren(src.files)
+}
+
+export function generateDocs(config: DocGenerationConfig) {
+  const paths = config.paths
+  const elements = loadSourceCode(config)
+
   generatePath(paths.output)
 
   const files = getRelativeHierarchy(paths.content)
@@ -153,5 +157,5 @@ export function generateDocs(config: DocGenerationConfig) {
   copyHierarchy(files, paths.content, paths.output, { elements: elements })
 
   if (typeof paths.diagrams === 'string')
-    processDiagrams(paths.diagrams, paths.output + '/diagrams')
+    generateDiagrams(paths.diagrams, paths.output + '/diagrams')
 }

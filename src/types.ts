@@ -1,7 +1,7 @@
 import {DeclarationReflection, SourceFile} from "typedoc/dist/lib/models";
 
 export interface PathConfig {
-  src: string[]
+  src?: string[]
   content: string,
   output: string
   tsconfig?: string

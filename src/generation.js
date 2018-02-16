@@ -84,7 +84,7 @@ function flattenModuleChildren(modules) {
     }
     return result;
 }
-function processDiagrams(inputPath, outputPath) {
+function generateDiagrams(inputPath, outputPath) {
     const viz = require('viz.js');
     const files = fs.readdirSync(inputPath)
         .filter(f => !fs.lstatSync(inputPath + '/' + f).isDirectory());
@@ -98,32 +98,36 @@ function processDiagrams(inputPath, outputPath) {
         fs.writeFileSync(outputPath + '/' + file.split('.')[0] + '.svg', outputContent);
     }
 }
-exports.processDiagrams = processDiagrams;
-function generateDocs(config) {
-    const paths = config.paths;
+exports.generateDiagrams = generateDiagrams;
+function loadSourceCode(config) {
+    if (!config.paths.src)
+        return {};
     const settings = {
         module: 'commonjs',
         excludeExternals: true
     };
-    if (paths.tsconfig)
-        settings.tsconfig = paths.tsconfig;
-    const app = new typedoc_1.Application(settings);
-    const sources = flatten(paths.src.map(getAbsoluteHierarchy))
+    const sources = flatten(config.paths.src.map(getAbsoluteHierarchy))
         .filter((s) => path.extname(s) == '.ts' && s.indexOf('.d.ts') == -1 && s.indexOf('index.ts') == -1)
         .map((f) => path.resolve(f));
+    const app = new typedoc_1.Application(settings);
     const src = app.convert(sources);
     if (!src)
         throw new Error("Error parsing TypeScript source.");
     const partials = fs.readdirSync('src/templates/partials')
         .map(f => f.split('.')[0]); // ['class', 'enum', 'function', 'function_body', 'interface', 'member', 'property', 'type']
     partials.forEach(loadPartialTemplate);
-    const elements = flattenModuleChildren(src.files);
+    return flattenModuleChildren(src.files);
+}
+exports.loadSourceCode = loadSourceCode;
+function generateDocs(config) {
+    const paths = config.paths;
+    const elements = loadSourceCode(config);
     generatePath(paths.output);
     const files = getRelativeHierarchy(paths.content);
     console.log(files);
     copyHierarchy(files, paths.content, paths.output, { elements: elements });
     if (typeof paths.diagrams === 'string')
-        processDiagrams(paths.diagrams, paths.output + '/diagrams');
+        generateDiagrams(paths.diagrams, paths.output + '/diagrams');
 }
 exports.generateDocs = generateDocs;
 //# sourceMappingURL=generation.js.map
