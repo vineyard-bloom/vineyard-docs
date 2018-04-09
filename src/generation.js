@@ -75,7 +75,8 @@ function flattenModuleChildren(modules) {
     const elements = flatten(modules.map(m => m.reflections));
     const result = {};
     for (let element of elements) {
-        if (element.kind == typedoc_1.ReflectionKind.Class || element.kind == typedoc_1.ReflectionKind.Interface) {
+        if ((element.kind == typedoc_1.ReflectionKind.Class || element.kind == typedoc_1.ReflectionKind.Interface)
+            && element.children) {
             result[element.name] = prepareClass(element);
         }
         else {
@@ -106,6 +107,7 @@ function loadSourceCode(config) {
         module: 'commonjs',
         excludeExternals: true,
         ignoreCompilerErrors: true,
+        tsconfig: config.paths.tsconfig
     };
     const sources = flatten(config.paths.src.map(getAbsoluteHierarchy))
         .filter((s) => path.extname(s) == '.ts' && s.indexOf('.d.ts') == -1 && s.indexOf('index.ts') == -1)

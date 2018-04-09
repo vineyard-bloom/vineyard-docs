@@ -93,7 +93,8 @@ function flattenModuleChildren(modules: SourceFile[]) {
   const elements = flatten(modules.map(m => m.reflections))
   const result: any = {}
   for (let element of elements) {
-    if (element.kind == ReflectionKind.Class || element.kind == ReflectionKind.Interface) {
+    if ((element.kind == ReflectionKind.Class || element.kind == ReflectionKind.Interface)
+      && element.children) {
       result[element.name] = prepareClass(element)
     }
     else {
@@ -128,6 +129,7 @@ export function loadSourceCode(config: DocGenerationConfig) {
     module: 'commonjs',
     excludeExternals: true,
     ignoreCompilerErrors: true,
+    tsconfig: config.paths.tsconfig
   }
 
   const sources = flatten(config.paths.src.map(getAbsoluteHierarchy))
