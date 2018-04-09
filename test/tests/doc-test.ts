@@ -1,4 +1,4 @@
-import {generateDocs} from "../../src/generation";
+import {generateDocs} from "../../src";
 
 require('source-map-support').install()
 import {assert} from 'chai'
