@@ -139,7 +139,7 @@ export function loadSourceCode(config: DocGenerationConfig) {
   if (!src)
     throw new Error("Error parsing TypeScript source.")
 
-  const partials = fs.readdirSync('src/templates/partials')
+  const partials = fs.readdirSync(__dirname + '/templates/partials')
     .map(f => f.split('.')[0])// ['class', 'enum', 'function', 'function_body', 'interface', 'member', 'property', 'type']
   partials.forEach(loadPartialTemplate)
 
