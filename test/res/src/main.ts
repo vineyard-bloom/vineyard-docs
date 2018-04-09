@@ -18,8 +18,8 @@ export class Main {
    * @param cycles  Does not do anything, just there for looks.
    * @param child
    */
-  run(cycles: number, child?: Main) {
-
+  async run(cycles: number, child?: Main): Promise<void> {
+    return Promise.resolve()
   }
 
   doNothing(): any[] {

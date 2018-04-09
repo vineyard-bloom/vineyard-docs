@@ -126,7 +126,8 @@ export function loadSourceCode(config: DocGenerationConfig) {
 
   const settings: any = {
     module: 'commonjs',
-    excludeExternals: true
+    excludeExternals: true,
+    ignoreCompilerErrors: true,
   }
 
   const sources = flatten(config.paths.src.map(getAbsoluteHierarchy))

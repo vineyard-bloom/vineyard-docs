@@ -104,7 +104,8 @@ function loadSourceCode(config) {
         return {};
     const settings = {
         module: 'commonjs',
-        excludeExternals: true
+        excludeExternals: true,
+        ignoreCompilerErrors: true,
     };
     const sources = flatten(config.paths.src.map(getAbsoluteHierarchy))
         .filter((s) => path.extname(s) == '.ts' && s.indexOf('.d.ts') == -1 && s.indexOf('index.ts') == -1)
