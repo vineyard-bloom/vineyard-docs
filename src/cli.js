@@ -34,5 +34,5 @@
 //   })
 // }
 //
-// run(process.argv) 
+// run(process.argv)
 //# sourceMappingURL=cli.js.map
