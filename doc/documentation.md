@@ -29,9 +29,9 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
     ```
 
 1. Customize your paths.
-    * `src` - source for the project's Typescript files, the files you want to document
-    * `content` - source for Handlebars files used to generate documentation
-    * `output` - destination where Markdown files will be output
+    * `src` - source folder for the project's Typescript files, the files you want to document
+    * `content` - source folder for Handlebars files used to generate documentation
+    * `output` - destination folder where Markdown files will be output
     * `tsconfig` - the tsconfig file for the project
 
 1. In the directory referenced in the `content` field, create a Handlebars file such as `documentation.handlebars`. Note that the file extension must be `.handlebars`. This Handlebars file will be used as the basis for generating your documentation.
@@ -40,7 +40,7 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
 
 1. Multiple Handlebars files may be created as desired for further organization. Each will output a corresponding Markdown file.
 
-1. Run your script with `node generate-docs.js`. Markdown files will be output to the directory specified earlier in the `output` field.
+1. Run your script with `node generate-docs.js` (note that this is the transpiled JS file). Markdown files will be output to the directory specified earlier in the `output` field.
 
 ### Customizing Documentation
 
@@ -88,16 +88,16 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
     ```
 
 1. Customize your paths.
-    * First parameter - source for Graphviz file
-    * Second parameter - destination for SVG file to be output
+    * First parameter - source folder for Graphviz files
+    * Second parameter - destination folder for SVG files to be output
 
 1. In the directory referenced as the first parameter in `generateDiagrams`, create a Graphviz file such as `graphic.gv`. This Graphviz file will be used as the basis for generating your graphic.
 
 1. Add content to the Graphviz file. See **Customizing Graphics** below.
 
-<!-- 1. Multiple Handlebars files may be created as desired for further organization. Each will output a corresponding Markdown file. -->
+1. Multiple Graphviz files may be created. Each will output a corresponding SVG file.
 
-1. Run your script with `node generate-diagrams.js`. The SVG file will be output to the directory specified earlier as the second parameter of `generateDiagrams`.
+1. Run your script with `node generate-diagrams.js` (note that this is the transpiled JS file). SVG files will be output to the directory specified earlier as the second parameter of `generateDiagrams`.
 
 ### Customizing Graphics
 
@@ -137,6 +137,6 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
 
 ![graphic](https://user-images.githubusercontent.com/31632938/40144578-5efc4c80-591c-11e8-9194-55417e68c647.png)
 
-* If you want to experiment with the above code, check out this [Graphviz editor](https://dreampuf.github.io/GraphvizOnline/).
+* If you want to experiment with the above code, check out this realtime [Graphviz editor](https://dreampuf.github.io/GraphvizOnline/).
 
 * For further customization, see the [Graphviz Documentation](https://graphviz.gitlab.io/documentation/).
