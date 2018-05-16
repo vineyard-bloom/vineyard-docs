@@ -91,17 +91,17 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
     * First parameter - source folder for Graphviz files
     * Second parameter - destination folder for SVG files to be output
 
-1. In the directory referenced as the first parameter in `generateDiagrams`, create a Graphviz file such as `graphic.gv`. This Graphviz file will be used as the basis for generating your graphic.
+1. In the directory referenced as the first parameter in `generateDiagrams`, create a Graphviz file such as `diagram.gv`. This Graphviz file will be used as the basis for generating your diagram.
 
-1. Add content to the Graphviz file. See **Customizing Graphics** below.
+1. Add content to the Graphviz file. See **Customizing Diagrams** below.
 
 1. Multiple Graphviz files may be created. Each will output a corresponding SVG file.
 
 1. Run your script with `node generate-diagrams.js` (note that this is the transpiled JavaScript file). SVG files will be output to the directory specified earlier as the second parameter of `generateDiagrams`.
 
-### Customizing Graphics
+### Customizing Diagrams
 
-* Here is an example of the basic syntax for generating graphics in Graphviz files, along with the corresponding graphic output.
+* Here is an example of the basic syntax for generating diagrams in Graphviz files, along with the corresponding graphic output.
 
     ```
     digraph G {
@@ -135,7 +135,7 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
     }
     ```
 
-![graphic](https://user-images.githubusercontent.com/31632938/40144578-5efc4c80-591c-11e8-9194-55417e68c647.png)
+![sample diagram](https://user-images.githubusercontent.com/31632938/40144578-5efc4c80-591c-11e8-9194-55417e68c647.png)
 
 * If you want to experiment with the above code, check out this realtime [Graphviz editor](https://dreampuf.github.io/GraphvizOnline/).
 
