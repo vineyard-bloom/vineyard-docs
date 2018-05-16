@@ -6,7 +6,7 @@ Vineyard Docs generates Markdown documentation from TypeScript using [TypeDoc](h
 
 * **Yarn** - navigate to the root of your TypeScript project and run `yarn add --dev vineyard-bloom/vineyard-docs`
 
-* **NPM** - navigate to the root of your TypeScript project and run `npm install --save-dev vineyard-bloom/vineyard-docs`
+* **npm** - navigate to the root of your TypeScript project and run `npm install --save-dev vineyard-bloom/vineyard-docs`
 
 ## Generating Documentation
 
