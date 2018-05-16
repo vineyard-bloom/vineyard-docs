@@ -1,12 +1,12 @@
 # Vineyard Docs
 
-Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and Handlebars templates and generates diagrams using Graphviz.
+Vineyard Docs generates Markdown documentation from TypeScript using [TypeDoc](http://typedoc.org/) and Handlebars templates and generates diagrams using [Graphviz](https://graphviz.gitlab.io/documentation/).
 
 ## Installation
 
-1. From the command line, navigate to the root of your TypeScript project.
+* **Yarn** - navigate to the root of your TypeScript project and run `yarn add --dev vineyard-bloom/vineyard-docs`
 
-1. Run `npm install --save-dev vineyard-bloom/vineyard-docs#1.0.0-beta`
+* **NPM** - navigate to the root of your TypeScript project and run `npm install --save-dev vineyard-bloom/vineyard-docs`
 
 ## Generating Documentation
 
@@ -36,13 +36,13 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
 
 1. In the directory referenced in the `content` field, create a Handlebars file such as `documentation.handlebars`. Note that the file extension must be `.handlebars`. This Handlebars file will be used as the basis for generating your documentation.
 
-1. Add content to the Handlebars file. Both Handlebars and Markdown syntax may be used. See **Customizing Documentation** below.
+1. Add content to the Handlebars file. Both Handlebars and Markdown syntax may be used. See [Defining Documentation](#defining-documentation) below.
 
 1. Multiple Handlebars files may be created as desired for further organization. Each will output a corresponding Markdown file.
 
 1. Run your script with `node generate-docs.js` (note that this is the transpiled JavaScript file). Markdown files will be output to the directory specified earlier in the `output` field.
 
-### Customizing Documentation
+### Defining Documentation
 
 * Regular Markdown syntax may be used within the Handlebars files. It will be output as-is to generated Markdown files.
 
@@ -56,8 +56,6 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
     {{> enum elements.YourEnumName }}
 
     {{> function elements.yourFunctionName }}
-
-    {{> function_body elements.yourFunctionName }}
     ```
 
 * Within TypeScript source files, comments added within a class definition will be included in the Markdown file when using `{{> class elements.YourclassName }}`. Comments must be in the following format:
@@ -68,7 +66,7 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
     */
     ```
 
-* Within comments, the following JavaDoc tags may be used for further customization (courtesy of [Typedoc](http://typedoc.org/guides/doccomments/)):
+* Within comments, the following JavaDoc tags may be used for further customization (courtesy of [TypeDoc](http://typedoc.org/guides/doccomments/)):
 
   * `@param <param name>` - documents a parameter for the subsequent method
   * `@return(s)` - documents the return of the subsequent method
@@ -93,13 +91,13 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
 
 1. In the directory referenced as the first parameter in `generateDiagrams`, create a Graphviz file such as `diagram.gv`. This Graphviz file will be used as the basis for generating your diagram.
 
-1. Add content to the Graphviz file. See **Customizing Diagrams** below.
+1. Add content to the Graphviz file. See [Defining Diagrams](#defining-diagrams) below.
 
 1. Multiple Graphviz files may be created. Each will output a corresponding SVG file.
 
 1. Run your script with `node generate-diagrams.js` (note that this is the transpiled JavaScript file). SVG files will be output to the directory specified earlier as the second parameter of `generateDiagrams`.
 
-### Customizing Diagrams
+### Defining Diagrams
 
 * Here is an example of the basic syntax for generating diagrams in Graphviz files, along with the corresponding graphic output.
 
@@ -138,5 +136,3 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
 ![sample diagram](https://user-images.githubusercontent.com/31632938/40144578-5efc4c80-591c-11e8-9194-55417e68c647.png)
 
 * If you want to experiment with the above code, check out this realtime [Graphviz editor](https://dreampuf.github.io/GraphvizOnline/).
-
-* For further customization, see the [Graphviz Documentation](https://graphviz.gitlab.io/documentation/).
