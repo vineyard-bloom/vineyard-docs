@@ -7,4 +7,4 @@ Uses TypeDoc and Handlebar templates.  Uses Graphviz for diagrams.
 Here's a handy Graphviz editor:
 https://dreampuf.github.io/GraphvizOnline
 
-[View Documentation](./doc/generation.md)
+[View Documentation](./doc/documentation.md)

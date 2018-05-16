@@ -4,14 +4,12 @@ export interface PathConfig {
     content: string;
     output: string;
     tsconfig?: string;
-    diagrams?: string;
 }
 export interface ProjectConfig {
     name: string;
     use?: string[];
 }
 export interface DocGenerationConfig {
-    project: ProjectConfig;
     paths: PathConfig;
 }
 export interface ClassInfo {

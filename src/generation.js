@@ -129,8 +129,6 @@ function generateDocs(config) {
     const files = getRelativeHierarchy(paths.content);
     console.log(files);
     copyHierarchy(files, paths.content, paths.output, { elements: elements });
-    if (typeof paths.diagrams === 'string')
-        generateDiagrams(paths.diagrams, paths.output + '/diagrams');
 }
 exports.generateDocs = generateDocs;
 //# sourceMappingURL=generation.js.map
