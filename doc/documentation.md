@@ -1,10 +1,10 @@
 # Vineyard Docs
 
-Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and Handlebars templates. Tools for generating diagrams using Graphviz also included.
+Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and Handlebars templates and generates diagrams using Graphviz.
 
 ## Installation
 
-1. From the command line, navigate to the root of your Typescript project.
+1. From the command line, navigate to the root of your TypeScript project.
 
 1. Run `npm install --save-dev vineyard-bloom/vineyard-docs#1.0.0-beta`
 
@@ -29,7 +29,7 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
     ```
 
 1. Customize your paths.
-    * `src` - source folder for the project's Typescript files, the files you want to document
+    * `src` - source folder for the project's TypeScript files, the files you want to document
     * `content` - source folder for Handlebars files used to generate documentation
     * `output` - destination folder where Markdown files will be output
     * `tsconfig` - the tsconfig file for the project
@@ -40,7 +40,7 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
 
 1. Multiple Handlebars files may be created as desired for further organization. Each will output a corresponding Markdown file.
 
-1. Run your script with `node generate-docs.js` (note that this is the transpiled JS file). Markdown files will be output to the directory specified earlier in the `output` field.
+1. Run your script with `node generate-docs.js` (note that this is the transpiled JavaScript file). Markdown files will be output to the directory specified earlier in the `output` field.
 
 ### Customizing Documentation
 
@@ -60,7 +60,7 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
     {{> function_body elements.yourFunctionName }}
     ```
 
-* Within Typescript source files, comments added within a class definition will be included in the Markdown file when using `{{> class elements.YourclassName }}`. Comments must be in the following format:
+* Within TypeScript source files, comments added within a class definition will be included in the Markdown file when using `{{> class elements.YourclassName }}`. Comments must be in the following format:
 
     ```
     /**
@@ -97,7 +97,7 @@ Vineyard Docs generates Markdown documentation from TypeScript using TypeDoc and
 
 1. Multiple Graphviz files may be created. Each will output a corresponding SVG file.
 
-1. Run your script with `node generate-diagrams.js` (note that this is the transpiled JS file). SVG files will be output to the directory specified earlier as the second parameter of `generateDiagrams`.
+1. Run your script with `node generate-diagrams.js` (note that this is the transpiled JavaScript file). SVG files will be output to the directory specified earlier as the second parameter of `generateDiagrams`.
 
 ### Customizing Graphics
 
