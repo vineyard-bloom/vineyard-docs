@@ -158,7 +158,4 @@ export function generateDocs(config: DocGenerationConfig) {
   console.log(files)
 
   copyHierarchy(files, paths.content, paths.output, { elements: elements })
-
-  if (typeof paths.diagrams === 'string')
-    generateDiagrams(paths.diagrams, paths.output + '/diagrams')
 }
